@@ -48,7 +48,7 @@ After [adding GPS information](addingGPSinformation.md) to my images I have the 
     EXIF data but I have not found a way to do the calculation/shifting described above in a few steps
   * Therefore I have created Timeshifter :wink:
 - Fix filenames
-  * that's an easy thing using [ExifTool](https://sno.phy.queensu.ca/~phil/exiftool/ "ExifTool by Phil Harvey")
+  * that's an easy job using [ExifTool](https://sno.phy.queensu.ca/~phil/exiftool/ "ExifTool by Phil Harvey")
 
 ## Implementation
 
@@ -84,7 +84,7 @@ This are the ExifTool parameters to extract the GPS timestamp (based on `GPS:GPS
 -csv
 -q
 ```
-This will write a CSV with one line per image to stdout like the following:
+This will write a CSV with one line per image file in `NewImages` to stdout like the following:
 ```
 SourceFile,GPSDateTime,DateTimeDigitized
 NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00
@@ -93,7 +93,7 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00
 
 ### adjustDates2Gps.timeshifter
 
-This CSV is piped into Timeshifter. Parameters are as follows (for syntax see [Timeshifter CLI](cli.md)):
+The CSV from above is piped into Timeshifter using the following parameters (for syntax see [Timeshifter CLI](cli.md)):
 ```
 # skip header line
 -is
@@ -169,6 +169,8 @@ The second command calls ExifTool to rename the files to the timestamp of `Creat
 %Y-%m-%d_%H-%M-%S.%%e
 -filename<CreateDate
 ```
+
+That's all :wink:
 
 ## Test environment
 - Windows 10
