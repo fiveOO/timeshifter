@@ -24,18 +24,18 @@ public class Timeshifter
         this.config = config;
     }
 
-    public void shift( final Reader in, final Writer out )
+    public void shiftCsv( final Reader in, final Writer out )
         throws IOException
     {
         try (final CSVReader cvsReader = new CSVReaderBuilder( in )
                 .withCSVParser( new CSVParserBuilder().withSeparator( ',' ).withQuoteChar( '"' ).build() )
                 .withSkipLines( config.getInputLinesToSkip() ).build())
         {
-            shift( StreamSupport.stream( cvsReader.spliterator(), false ).map( this::cleanupFields ), out );
+            shift( StreamSupport.stream( cvsReader.spliterator(), false ), out );
         }
     }
 
-    protected void shift( final Stream<String[]> dataStream, final Writer out )
+    public void shift( final Stream<String[]> dataStream, final Writer out )
     {
         try (final Stream<String> streamOfLines = shift( dataStream ))
         {
@@ -43,7 +43,7 @@ public class Timeshifter
         }
     }
 
-    protected Stream<String> shift( final Stream<String[]> dataStream )
+    public Stream<String> shift( final Stream<String[]> dataStream )
     {
         final Stream<String> headerLineStream = Stream.of( config.getOutputHeaderLine() ).map( this::formatFixPattern );
         final Stream<String> footerLineStream = Stream.of( config.getOutputFooterLine() ).map( this::formatFixPattern );
@@ -53,17 +53,7 @@ public class Timeshifter
 
     protected Stream<String> transformLines( final Stream<String[]> dataStream )
     {
-        return dataStream.map( this::transformLine );
-    }
-
-    protected String[] cleanupFields( final String[] values )
-    {
-        for( int i = 0; i < values.length; i++ )
-        {
-            values[i] = values[i] == null ? "" : values[i].trim();
-        }
-
-        return values;
+        return dataStream.map( this::transformLine ).filter( s -> s != null && !s.trim().isEmpty() );
     }
 
     protected String transformLine( final String[] values )
@@ -135,14 +125,16 @@ public class Timeshifter
             final String dateTimeToTakeZoneOffsetStr )
     {
         final ZoneOffset offset =
-                OffsetDateTime.parse( dateTimeToTakeZoneOffsetStr, config.getInputDateFormatter() ).getOffset();
+                OffsetDateTime.parse( sanitizeField( dateTimeToTakeZoneOffsetStr ), config.getInputDateFormatter() )
+                        .getOffset();
 
         return createShiftedTime( dateTimeToShiftStr, offset );
     }
 
     protected OffsetDateTime createShiftedTime( final String dateTimeToShiftStr, final ZoneOffset offset )
     {
-        return applyOffset( OffsetDateTime.parse( dateTimeToShiftStr, config.getInputDateFormatter() ), offset );
+        return applyOffset( OffsetDateTime.parse( sanitizeField( dateTimeToShiftStr ), config.getInputDateFormatter() ),
+                offset );
     }
 
     protected OffsetDateTime applyOffset( final OffsetDateTime dateTime, final ZoneOffset offset )
@@ -176,6 +168,11 @@ public class Timeshifter
         {
             throw TimeshifterException.errorWritingOutput( e );
         }
+    }
+
+    protected String sanitizeField( final String value )
+    {
+        return value == null ? "" : value.trim();
     }
 
     private void logError( final String msg, final Exception e )

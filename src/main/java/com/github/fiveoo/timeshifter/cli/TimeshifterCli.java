@@ -72,7 +72,7 @@ public class TimeshifterCli
 
         try (Reader r = reader; Writer w = writer;)
         {
-            shifter.shift( r, w );
+            shifter.shiftCsv( r, w );
         }
     }
 

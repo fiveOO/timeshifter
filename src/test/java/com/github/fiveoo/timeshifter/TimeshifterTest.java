@@ -1,17 +1,21 @@
 package com.github.fiveoo.timeshifter;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.fiveoo.timeshifter.Timeshifter;
 import com.github.fiveoo.timeshifter.cli.MutableTimeshifterConfig;
 
 public class TimeshifterTest
@@ -51,17 +55,41 @@ public class TimeshifterTest
     }
 
     @Test
-    public void transformShouldUseDefaultFormat()
+    public void transformLinesShouldSkipNotParseableLines()
+        throws IOException
+    {
+        final String[] lineOk = new String[] { "infoData", "2019:03:13 09:14:27Z", "2019:03:13 10:10:00+04:30" };
+        final String[] lineNok = new String[] { "infoData", "-not parseable date-", "2019:03:13 10:10:00+04:30" };
+
+        final List<String> resultList =
+                cut.transformLines( Arrays.asList( lineNok, lineOk, lineNok ).stream() ).collect( Collectors.toList() );
+
+        assertThat( resultList, hasSize( 1 ) );
+        assertThat( resultList, hasItem(
+                "infoData,2019:03:13 09:14:27Z,2019:03:13 10:10:00+04:30,2019:03:13 13:44:27+04:30,2019:03:13 13:44:27" ) );
+    }
+
+    @Test
+    public void transformLineShouldNotThrowExceptionIfNotParseable()
+        throws IOException
+    {
+        final String[] line = new String[] { "infoData", "-not parseable date-", "2019:03:13 10:10:00+04:30" };
+
+        assertThat( cut.transformLine( line ), equalTo( "" ) );
+    }
+
+    @Test
+    public void transformLineShouldUseDefaultFormat()
         throws IOException
     {
         final String[] line = new String[] { "infoData", "2019:03:13 09:14:27Z", "2019:03:13 10:10:00+04:30" };
 
-        assertThat( cut.transformLine( line ),
-                equalTo( "infoData,2019:03:13 09:14:27Z,2019:03:13 10:10:00+04:30,2019:03:13 13:44:27+04:30,2019:03:13 13:44:27" ) );
+        assertThat( cut.transformLine( line ), equalTo(
+                "infoData,2019:03:13 09:14:27Z,2019:03:13 10:10:00+04:30,2019:03:13 13:44:27+04:30,2019:03:13 13:44:27" ) );
     }
 
     @Test
-    public void transformShouldUseCustomFormat()
+    public void transformLineShouldUseCustomFormat()
         throws IOException
     {
         final String[] line = new String[] { "infoData", "2019:03:13 09:14:27Z", "2019:03:13 10:10:00+04:30" };
