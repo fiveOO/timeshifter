@@ -52,8 +52,7 @@ public class TimeshifterCliTest
     {
         final Path outPath = dataFolder.resolve( "out.txt" );
         final int parseResult = cut.parseParameters( null, "-i", "\"" + exampleValidPath.toUri().toString() + "\"",
-                "-o",
-                "\"" + outPath.toUri().toString() + "\"" );
+                "-o", "\"" + outPath.toUri().toString() + "\"" );
 
         assertThat( parseResult, equalTo( 0 ) );
 
@@ -65,6 +64,28 @@ public class TimeshifterCliTest
                 "NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00,2019:03:09 18:58:00+01:00,2019:03:09 18:58:0" ) );
         assertThat( outLines, hasItem(
                 "NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,2019:03:10 14:59:36+01:00,2019:03:10 14:59:36" ) );
+    }
+
+    @Test
+    public void runApplIsProcessingInputStreamToOutputStream()
+        throws Exception
+    {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (final PrintStream baos = new PrintStream( out ))
+        {
+            final int parseResult = cut.parseParameters( null );
+            assertThat( parseResult, equalTo( 0 ) );
+
+            cut.runAppl( getClass().getResourceAsStream( "exampleInputValid.txt" ), baos );
+        }
+
+        final String output = new String( out.toByteArray() );
+
+        assertThat( output,
+                equalTo( "NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00,2019:03:09 18:58:00+01:00,2019:03:09 18:58:0"
+                        + System.lineSeparator()
+                        + "NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,2019:03:10 14:59:36+01:00,2019:03:10 14:59:36"
+                        + System.lineSeparator() ) );
     }
 
     @Test
