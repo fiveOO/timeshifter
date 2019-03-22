@@ -1,8 +1,10 @@
 package com.github.fiveoo.timeshifter.cli;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
@@ -29,7 +31,7 @@ public class TimeshifterCli
     public static void main( final String... args )
     {
         final TimeshifterCli timeshifterCli = new TimeshifterCli();
-        final int parseResult = timeshifterCli.parseParameters( args );
+        final int parseResult = timeshifterCli.parseParameters( System.err, args );
 
         if( parseResult != 0 )
         {
@@ -39,7 +41,7 @@ public class TimeshifterCli
 
         try
         {
-            timeshifterCli.runAppl();
+            timeshifterCli.runAppl( System.in, System.out );
         }
         catch( final Exception e )
         {
@@ -48,7 +50,7 @@ public class TimeshifterCli
         }
     }
 
-    void runAppl()
+    void runAppl( final InputStream stdIn, final PrintStream stdOut )
         throws IOException
     {
         final Timeshifter shifter = new Timeshifter( config );
@@ -56,7 +58,7 @@ public class TimeshifterCli
         Reader reader;
         if( config.getInputFileName() == null )
         {
-            reader = new InputStreamReader( System.in, StandardCharsets.UTF_8 );
+            reader = new InputStreamReader( stdIn, StandardCharsets.UTF_8 );
         }
         else
         {
@@ -65,7 +67,7 @@ public class TimeshifterCli
         Writer writer;
         if( config.getOutputFileName() == null )
         {
-            writer = new OutputStreamWriter( System.out, StandardCharsets.UTF_8 );
+            writer = new OutputStreamWriter( stdOut, StandardCharsets.UTF_8 );
         }
         else
         {
@@ -91,7 +93,7 @@ public class TimeshifterCli
      *
      * @return &lt;0 in case of an error; 0 if correct; &gt;0 if help was called
      */
-    int parseParameters( final String... args )
+    int parseParameters( final PrintStream out, final String... args )
     {
         final JCommander parser = new JCommander( this );
         parser.setColumnSize( 80 );
@@ -102,14 +104,14 @@ public class TimeshifterCli
 
             if( help )
             {
-                System.err.println( usage( parser, null ) );
+                out.println( usage( parser, null ) );
 
                 return 1;
             }
         }
         catch( final ParameterException e )
         {
-            System.err.println( usage( parser, new StringBuilder().append( e.getLocalizedMessage() )
+            out.println( usage( parser, new StringBuilder().append( e.getLocalizedMessage() )
                     .append( System.lineSeparator() ).append( System.lineSeparator() ) ) );
 
             return -1;

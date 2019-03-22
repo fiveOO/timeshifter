@@ -9,8 +9,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
@@ -53,12 +51,13 @@ public class TimeshifterCliTest
         throws Exception
     {
         final Path outPath = dataFolder.resolve( "out.txt" );
-        final int parseResult = cut.parseParameters( "-i", "\"" + exampleValidPath.toUri().toString() + "\"", "-o",
+        final int parseResult = cut.parseParameters( null, "-i", "\"" + exampleValidPath.toUri().toString() + "\"",
+                "-o",
                 "\"" + outPath.toUri().toString() + "\"" );
 
         assertThat( parseResult, equalTo( 0 ) );
 
-        cut.runAppl();
+        cut.runAppl( null, null );
 
         final List<String> outLines = Files.readAllLines( outPath, StandardCharsets.UTF_8 );
         assertThat( outLines, hasSize( 2 ) );
@@ -75,13 +74,7 @@ public class TimeshifterCliTest
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (final PrintStream baos = new PrintStream( out ))
         {
-            System.setErr( baos );
-
-            assertThat( cut.parseParameters( "-h" ), equalTo( 1 ) );
-        }
-        finally
-        {
-            System.setErr( new PrintStream( new FileOutputStream( FileDescriptor.out ) ) );
+            assertThat( cut.parseParameters( baos, "-h" ), equalTo( 1 ) );
         }
 
         final String output = new String( out.toByteArray() );
@@ -96,13 +89,7 @@ public class TimeshifterCliTest
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (final PrintStream baos = new PrintStream( out ))
         {
-            System.setErr( baos );
-
-            assertThat( cut.parseParameters( "-hugo" ), equalTo( -1 ) );
-        }
-        finally
-        {
-            System.setErr( new PrintStream( new FileOutputStream( FileDescriptor.out ) ) );
+            assertThat( cut.parseParameters( baos, "-hugo" ), equalTo( -1 ) );
         }
 
         final String output = new String( out.toByteArray() );
