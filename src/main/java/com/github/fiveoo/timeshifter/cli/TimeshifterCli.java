@@ -5,8 +5,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.beust.jcommander.JCommander;
@@ -24,7 +26,7 @@ public class TimeshifterCli
     @ParametersDelegate
     private final TimeshifterConfig config = new MutableTimeshifterConfig();
 
-    public static void main( final String[] args )
+    public static void main( final String... args )
     {
         final TimeshifterCli timeshifterCli = new TimeshifterCli();
         final int parseResult = timeshifterCli.parseParameters( args );
@@ -46,7 +48,7 @@ public class TimeshifterCli
         }
     }
 
-    private void runAppl()
+    void runAppl()
         throws IOException
     {
         final Timeshifter shifter = new Timeshifter( config );
@@ -58,7 +60,7 @@ public class TimeshifterCli
         }
         else
         {
-            reader = Files.newBufferedReader( Paths.get( config.getInputFileName() ), StandardCharsets.UTF_8 );
+            reader = Files.newBufferedReader( createPath( config.getInputFileName() ), StandardCharsets.UTF_8 );
         }
         Writer writer;
         if( config.getOutputFileName() == null )
@@ -67,13 +69,19 @@ public class TimeshifterCli
         }
         else
         {
-            writer = Files.newBufferedWriter( Paths.get( config.getOutputFileName() ), StandardCharsets.UTF_8 );
+            writer = Files.newBufferedWriter( createPath( config.getOutputFileName() ), StandardCharsets.UTF_8 );
         }
 
         try (Reader r = reader; Writer w = writer;)
         {
             shifter.shiftCsv( r, w );
         }
+    }
+
+    protected Path createPath( final String fileName )
+    {
+        // check if the file name may be an URI
+        return fileName.indexOf( ':' ) > 1 ? Paths.get( URI.create( fileName ) ) : Paths.get( fileName );
     }
 
     /**
@@ -83,7 +91,7 @@ public class TimeshifterCli
      *
      * @return &lt;0 in case of an error; 0 if correct; &gt;0 if help was called
      */
-    private int parseParameters( final String[] args )
+    int parseParameters( final String... args )
     {
         final JCommander parser = new JCommander( this );
         parser.setColumnSize( 80 );
@@ -110,7 +118,7 @@ public class TimeshifterCli
         return 0;
     }
 
-    private StringBuilder usage( final JCommander parser, final StringBuilder usage )
+    StringBuilder usage( final JCommander parser, final StringBuilder usage )
     {
         StringBuilder result = usage;
         if( result == null )

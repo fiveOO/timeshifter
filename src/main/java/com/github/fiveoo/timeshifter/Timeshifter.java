@@ -95,6 +95,10 @@ public class Timeshifter
             }
             b.append( '%' ).append( i + 1 ).append( "$s" );
         }
+        if( length > 0 )
+        {
+            b.append( "%n" );
+        }
 
         return b.toString();
     }

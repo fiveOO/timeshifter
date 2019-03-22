@@ -3,6 +3,7 @@ package com.github.fiveoo.timeshifter.cli;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.beust.jcommander.Parameter;
@@ -148,11 +149,6 @@ public class MutableTimeshifterConfig
         this.outputFileName = outputFileName;
     }
 
-    public String getOutputDateFormat()
-    {
-        return outputDateFormat;
-    }
-
     public void setOutputDateFormat( final String outputDateFormat )
     {
         this.outputDateFormat = outputDateFormat;
@@ -184,10 +180,13 @@ public class MutableTimeshifterConfig
         return String.join( "", outputHeaderLine.toArray( new String[outputHeaderLine.size()] ) );
     }
 
-    public void setOutputHeaderLine( final String outputHeaderLine )
+    public void setOutputHeaderLine( final String[] outputHeaderLine )
     {
         this.outputHeaderLine = new ArrayList<>();
-        this.outputHeaderLine.add( outputHeaderLine );
+        if( outputHeaderLine != null )
+        {
+            this.outputHeaderLine.addAll( Arrays.asList( outputHeaderLine ) );
+        }
     }
 
     @Override
@@ -200,10 +199,13 @@ public class MutableTimeshifterConfig
         return String.join( "", outputFooterLine.toArray( new String[outputFooterLine.size()] ) );
     }
 
-    public void setOutputFooterLine( final String outputFooterLine )
+    public void setOutputFooterLine( final String[] outputFooterLine )
     {
         this.outputFooterLine = new ArrayList<>();
-        this.outputFooterLine.add( outputFooterLine );
+        if( outputFooterLine != null )
+        {
+            this.outputFooterLine.addAll( Arrays.asList( outputFooterLine ) );
+        }
     }
 
     /*-- Calculated values --*/
