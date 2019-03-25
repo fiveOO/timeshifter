@@ -124,7 +124,7 @@ public class MutableTimeshifterConfigTest
         final DateTimeFormatter formatter = cut.getOutputDateFormatterLocal();
 
         assertThat( formatter, notNullValue() );
-        assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019 42-50-13" ) );
+        assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019  42-50-13" ) );
     }
 
     @Test
