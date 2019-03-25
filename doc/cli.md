@@ -59,4 +59,56 @@ Error codes:
 
 ## Details
 
-TODO
+### Date / time formatting / parsing (input / output)
+
+Date / time formatting is done using the class `DateTimeFormatter`. For information of the possible formatting
+pattern / symbols have a look at the
+[JavaDoc of DateTimeFormatter](https://docs.oracle.com/javase/8/docs/api/index.html?java/time/format/DateTimeFormatter.html)
+section "Patterns for Formatting and Parsing".
+
+### Output line formatting
+
+Formatting of the output line is done using the class `Formatter`. For information of the possible formatting
+pattern / symbols have a look at the
+[JavaDoc of Formatter](https://docs.oracle.com/javase/8/docs/api/index.html?java/util/Formatter.html).
+
+### outLineFormat / outHeader / outFooter
+
+Values of these options can be given as
+- ONE value: `-ol "So Long, and Thanks for All the Fish"` by enclosing it in double quotes (Windows) / single quotes (*nix)
+  or as
+- a LIST of "words": `-ol So Long, and Thanks for All the Fish` which is taken by the OS as a list of nine options
+  as the "words" are separated by spaces.
+  In that case each "word" found will be added to the value of `-ol` as long as the "word" does not start with a
+  defined option name like `-is`.
+
+### Using a parameter file
+
+You could store all parameters in a separate parameter file and pass this to Timeshifter like
+`java -jar timeshifter.jar @example.param`.
+
+The requirements are very similar to ExifTools ARGFILEs.
+> The file contains one argument per line (NOT one option per line -- some options require additional arguments, and all
+> arguments must be placed on separate lines). Blank lines and lines beginning with # are ignored ... White space at the
+> start of a line is removed. Normal shell processing of arguments is not performed, which among other things means that
+> arguments should not be quoted and spaces are treated as any other character.
+>
+> -- <cite>Phil Harvey</cite>
+
+```
+-ol
+So Long, and Thanks for All the Fish
+```
+is equivalent to
+```
+-ol
+So
+Long,
+and
+Thanks
+for
+All
+the
+Fish
+```
+These two variants correspond to the two ways of passing options described above.
