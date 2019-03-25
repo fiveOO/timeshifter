@@ -50,7 +50,7 @@ public class TimeshifterTest
                 StandardCharsets.UTF_8 ), writer );
 
         assertThat( writer.toString(),
-                equalTo( "NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00,2019:03:09 18:58:00+01:00,2019:03:09 18:58:0"
+                equalTo( "NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00,2019:03:09 18:58:00+01:00,2019:03:09 18:58:00"
                         + System.lineSeparator()
                         + "NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,2019:03:10 14:59:36+01:00,2019:03:10 14:59:36"
                         + System.lineSeparator() ) );

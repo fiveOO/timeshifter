@@ -225,7 +225,7 @@ public class MutableTimeshifterConfig
     public DateTimeFormatter getOutputDateFormatterLocal()
     {
         final String outputFormatGlobal = outputDateFormat == null ? DEFAULT_DATE_TIME_PATTERN : outputDateFormat;
-        final String outputFormatLocal = outputFormatGlobal.replaceAll( "[^'][0VXxZz]+", "" );
+        final String outputFormatLocal = outputFormatGlobal.replaceAll( "([^'])[0VXxZz]+", "$1" );
 
         return DateTimeFormatter.ofPattern( outputFormatLocal );
     }
