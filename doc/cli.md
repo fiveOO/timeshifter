@@ -78,7 +78,7 @@ Values of these options can be given as
 - ONE value: `-ol "So Long, and Thanks for All the Fish"` by enclosing it in double quotes (Windows) / single quotes (*nix)
   or as
 - a LIST of "words": `-ol So Long, and Thanks for All the Fish` which is taken by the OS as a list of nine options
-  as the "words" are separated by spaces.
+  as the "words" are separated by spaces and not enclosed in double / single quotes.
   In that case each "word" found will be added to the value of `-ol` as long as the "word" does not start with a
   defined option name like `-is`.
 

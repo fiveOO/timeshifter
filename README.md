@@ -11,8 +11,12 @@ For a complete example on how I use it see [Fixing timestamps in EXIF](doc/exifE
 
 All command line parameters are decribed in [Timeshifter CLI](doc/cli.md).
 
+## Download
+
+????
+
 ## Short examples
-Most of the examples using a data file calles `example.csv`. You could find it at the bottom of this page.
+Most of the examples using a data file called `example.csv`. You could find it at the bottom of this page.
 ### Timezone taken from given data
 #### Input from file
 
