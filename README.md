@@ -11,9 +11,12 @@ For a complete example on how I use it see [Fixing timestamps in EXIF](doc/exifE
 
 All command line parameters are decribed in [Timeshifter CLI](doc/cli.md).
 
-## Download
+## Download / Installation
 
-????
+Just download `timeshifter-<version>.jar` from the [latest release](https://github.com/fiveOO/timeshifter/releases).
+There's no special installation necessary.
+
+You just have to have Java Runtime Environment (>= Java 8) installed.
 
 ## Short examples
 Most of the examples using a data file called `example.csv`. You could find it at the bottom of this page.
