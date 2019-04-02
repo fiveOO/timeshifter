@@ -96,14 +96,14 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00
 The CSV from above is piped into Timeshifter using the following parameters (for syntax see [Timeshifter CLI](cli.md)):
 ```
 # skip header line
--is
+-ils
 1
 
 # output line per image using shifted date/time
 # %1$s: file name
 # %4$s: shifted date/time incl timezone information
 # %5$s: shifted date/time excl timezone information
--ol
+-olf
 -m%n
 -P%n
 -a%n
@@ -119,7 +119,7 @@ The CSV from above is piped into Timeshifter using the following parameters (for
 -execute%n
 
 # footer line: stop exiftool from stay_open mode
--of
+-off
 -stay_open%n
 False%n
 ```

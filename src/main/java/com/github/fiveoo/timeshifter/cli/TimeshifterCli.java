@@ -1,5 +1,7 @@
 package com.github.fiveoo.timeshifter.cli;
 
+import static com.github.fiveoo.timeshifter.cli.Constants.JAVADOC_BASE_URL;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,6 +132,10 @@ public class TimeshifterCli
         result.append( "Calculates dates shifted by a timezone offset" );
         result.append( System.lineSeparator() ).append( System.lineSeparator() );
         parser.usage( result );
+        result.append( System.lineSeparator() ).append(
+                "For help on date/time formats see " + JAVADOC_BASE_URL
+                        + "java/time/format/DateTimeFormatter.html" );
+        result.append( System.lineSeparator() );
         result.append( System.lineSeparator() ).append( "Error codes:" );
         result.append( System.lineSeparator() ).append( "  < 0: some error occurred; see error message" );
         result.append( System.lineSeparator() ).append( "  = 0: everything's fine" );

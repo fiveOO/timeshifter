@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
@@ -133,7 +134,7 @@ public class TimeshifterTest
         thrown.expect( TimeshifterException.class );
         thrown.expectMessage( "11 fields are required but" );
 
-        config.setFieldIdxToShift( 10 );
+        config.setInDateShiftIdx( 10 );
 
         final String[] values = new String[] { "infoData", "2019:03:13 09:14:27Z" };
 
@@ -147,7 +148,7 @@ public class TimeshifterTest
         thrown.expect( TimeshifterException.class );
         thrown.expectMessage( "9 fields are required but" );
 
-        config.setFieldIdxOfOffset( 8 );
+        config.setInDateOffsetIdx( 8 );
 
         final String[] values = new String[] { "infoData", "2019:03:13 09:14:27Z" };
 
@@ -155,10 +156,10 @@ public class TimeshifterTest
     }
 
     @Test
-    public void createShiftedTimeShouldUseFixZoneOffsetWithoutOffsetTime()
+    public void createShiftedTimeShouldUseOutDateShiftedOffsetWithoutOffsetTime()
         throws IOException
     {
-        config.setFixOffset( ZoneOffset.ofHoursMinutes( 2, 20 ) );
+        config.setOutDateShiftedOffset( ZoneOffset.ofHoursMinutes( 2, 20 ) );
 
         final String[] values = new String[] { "infoData", "2019:03:13 09:14:27Z" };
 
@@ -167,14 +168,28 @@ public class TimeshifterTest
     }
 
     @Test
-    public void createShiftedTimeShouldUseFixZoneOffsetWithOffsetTime()
+    public void createShiftedTimeShouldUseOutDateShiftedOffsetWithOffsetTime()
         throws IOException
     {
-        config.setFixOffset( ZoneOffset.ofHoursMinutes( 2, 20 ) );
+        config.setOutDateShiftedOffset( ZoneOffset.ofHoursMinutes( 2, 20 ) );
 
         final String[] values = new String[] { "infoData", "2019:03:13 09:14:27Z", "2019:03:13 10:10:00+04:30" };
 
         assertThat( cut.createShiftedTime( values ), equalTo( OffsetDateTime.parse( "2019:03:13 11:34:27+02:20",
+                MutableTimeshifterConfig.DEFAULT_DATE_TIME_FORMATTER ) ) );
+    }
+
+    @Test
+    public void createShiftedTimeShouldUseInputTZ()
+        throws IOException
+    {
+        config.setOutDateShiftedOffset( ZoneOffset.ofHoursMinutes( 2, 20 ) );
+        config.setInDateShiftFormat( "yyyy:MM:dd HH:mm:ss" );
+        config.setInDateShiftZone( ZoneId.of( "Europe/Berlin" ) );
+
+        final String[] values = new String[] { "infoData", "2019:03:13 09:14:27", "2019:03:13 10:10:00+04:30" };
+
+        assertThat( cut.createShiftedTime( values ), equalTo( OffsetDateTime.parse( "2019:03:13 10:34:27+02:20",
                 MutableTimeshifterConfig.DEFAULT_DATE_TIME_FORMATTER ) ) );
     }
 

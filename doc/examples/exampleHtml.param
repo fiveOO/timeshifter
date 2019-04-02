@@ -1,14 +1,14 @@
 -i
 example.csv
 
--is
+-ils
 1
 
--oh
+-ohf
 <ul>%n
 
--ol
+-olf
 <li><a href="%1$s">Image %1$s</a> taken on %4$s</li>%n
 
--of
+-off
 </ul>

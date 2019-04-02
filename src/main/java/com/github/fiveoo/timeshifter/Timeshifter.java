@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.stream.Stream;
@@ -29,7 +32,7 @@ public class Timeshifter
     {
         try (final CSVReader cvsReader = new CSVReaderBuilder( in )
                 .withCSVParser( new CSVParserBuilder().withSeparator( ',' ).withQuoteChar( '"' ).build() )
-                .withSkipLines( config.getInputLinesToSkip() ).build())
+                .withSkipLines( config.getInLinesSkip() ).build())
         {
             shift( StreamSupport.stream( cvsReader.spliterator(), false ), out );
         }
@@ -45,8 +48,8 @@ public class Timeshifter
 
     public Stream<String> shift( final Stream<String[]> dataStream )
     {
-        final Stream<String> headerLineStream = Stream.of( config.getOutputHeaderLine() ).map( this::formatFixPattern );
-        final Stream<String> footerLineStream = Stream.of( config.getOutputFooterLine() ).map( this::formatFixPattern );
+        final Stream<String> headerLineStream = Stream.of( config.getOutHeaderFormat() ).map( this::formatFixPattern );
+        final Stream<String> footerLineStream = Stream.of( config.getOutFooterFormat() ).map( this::formatFixPattern );
 
         return Stream.concat( Stream.concat( headerLineStream, transformLines( dataStream ) ), footerLineStream );
     }
@@ -73,8 +76,8 @@ public class Timeshifter
     protected String formatOutputLine( final String[] inputFields, final OffsetDateTime shiftedTime )
     {
         final Object[] outData = Arrays.copyOf( inputFields, inputFields.length + 2 );
-        outData[outData.length - 2] = shiftedTime.format( config.getOutputDateFormatter() );
-        outData[outData.length - 1] = shiftedTime.format( config.getOutputDateFormatterLocal() );
+        outData[outData.length - 2] = shiftedTime.format( config.getOutDateShiftedFormatter() );
+        outData[outData.length - 1] = shiftedTime.format( config.getOutDateShiftedFormatterLocal() );
 
         String format = config.getOutputLineFormat();
         if( format == null )
@@ -105,40 +108,51 @@ public class Timeshifter
 
     protected OffsetDateTime createShiftedTime( final String[] values )
     {
-        if( config.getFieldIdxToShift() >= values.length )
+        if( config.getInDateShiftIdx() >= values.length )
         {
-            throw TimeshifterException.tooLessFields( values.length, config.getFieldIdxToShift() + 1 );
+            throw TimeshifterException.tooLessFields( values.length, config.getInDateShiftIdx() + 1 );
         }
 
-        if( config.getFixOffset() == null )
+        if( config.getOutDateShiftedOffset() == null )
         {
-            if( config.getFieldIdxOfOffset() >= values.length )
+            if( config.getInDateOffsetIdx() >= values.length )
             {
-                throw TimeshifterException.tooLessFields( values.length, config.getFieldIdxOfOffset() + 1 );
+                throw TimeshifterException.tooLessFields( values.length, config.getInDateOffsetIdx() + 1 );
             }
 
-            return createShiftedTime( values[config.getFieldIdxToShift()], values[config.getFieldIdxOfOffset()] );
+            return createShiftedTime( values[config.getInDateShiftIdx()], values[config.getInDateOffsetIdx()] );
         }
         else
         {
-            return createShiftedTime( values[config.getFieldIdxToShift()], config.getFixOffset() );
+            return createShiftedTime( values[config.getInDateShiftIdx()], config.getOutDateShiftedOffset() );
         }
     }
 
     protected OffsetDateTime createShiftedTime( final String dateTimeToShiftStr,
             final String dateTimeToTakeZoneOffsetStr )
     {
-        final ZoneOffset offset =
-                OffsetDateTime.parse( sanitizeField( dateTimeToTakeZoneOffsetStr ), config.getInputDateFormatter() )
-                        .getOffset();
+        final ZoneOffset offset = OffsetDateTime
+                .parse( sanitizeField( dateTimeToTakeZoneOffsetStr ), config.getInDateOffsetFormatter() ).getOffset();
 
         return createShiftedTime( dateTimeToShiftStr, offset );
     }
 
     protected OffsetDateTime createShiftedTime( final String dateTimeToShiftStr, final ZoneOffset offset )
     {
-        return applyOffset( OffsetDateTime.parse( sanitizeField( dateTimeToShiftStr ), config.getInputDateFormatter() ),
-                offset );
+        return applyOffset( parse( sanitizeField( dateTimeToShiftStr ), config.getInDateShiftFormatter(),
+                config.getInDateShiftZone() ), offset );
+    }
+
+    protected OffsetDateTime parse( final String dateTimeStr, final DateTimeFormatter formatter, final ZoneId zoneId )
+    {
+        if( zoneId == null )
+        {
+            return OffsetDateTime.parse( dateTimeStr, formatter );
+        }
+        else
+        {
+            return LocalDateTime.parse( dateTimeStr, formatter ).atZone( zoneId ).toOffsetDateTime();
+        }
     }
 
     protected OffsetDateTime applyOffset( final OffsetDateTime dateTime, final ZoneOffset offset )

@@ -1,5 +1,6 @@
 package com.github.fiveoo.timeshifter;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
@@ -16,25 +17,29 @@ public interface TimeshifterConfig
 {
     String getInputFileName();
 
-    int getInputLinesToSkip();
+    DateTimeFormatter getInDateShiftFormatter();
 
-    int getFieldIdxToShift();
+    ZoneId getInDateShiftZone();
 
-    int getFieldIdxOfOffset();
+    int getInDateShiftIdx();
 
-    ZoneOffset getFixOffset();
+    DateTimeFormatter getInDateOffsetFormatter();
+
+    int getInDateOffsetIdx();
+
+    int getInLinesSkip();
 
     String getOutputFileName();
 
+    ZoneOffset getOutDateShiftedOffset();
+
+    DateTimeFormatter getOutDateShiftedFormatter();
+
+    DateTimeFormatter getOutDateShiftedFormatterLocal();
+
     String getOutputLineFormat();
 
-    String getOutputHeaderLine();
+    String getOutHeaderFormat();
 
-    String getOutputFooterLine();
-
-    DateTimeFormatter getInputDateFormatter();
-
-    DateTimeFormatter getOutputDateFormatter();
-
-    DateTimeFormatter getOutputDateFormatterLocal();
+    String getOutFooterFormat();
 }

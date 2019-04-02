@@ -29,41 +29,70 @@ public class MutableTimeshifterConfigTest
     }
 
     @Test
-    public void getFieldIdxToShiftWOSetShouldReturnDefaultValue()
+    public void getInDateShiftIdxWOSetShouldReturnDefaultValue()
     {
-        assertThat( cut.getFieldIdxToShift(), is( 1 ) );
+        assertThat( cut.getInDateShiftIdx(), is( 1 ) );
     }
 
     @Test
-    public void getFieldIdxOfOffsetWOSetShouldReturnDefaultValue()
+    public void getInDateOffsetIdxWOSetShouldReturnDefaultValue()
     {
-        assertThat( cut.getFieldIdxOfOffset(), is( 2 ) );
+        assertThat( cut.getInDateOffsetIdx(), is( 2 ) );
     }
 
     @Test
-    public void getInputDateFormatterWOSetFormatShouldReturnDefaultFormatter()
+    public void getInDateShiftFormatterWOSetFormatShouldReturnDefaultFormatter()
     {
-        final DateTimeFormatter formatter = cut.getInputDateFormatter();
+        final DateTimeFormatter formatter = cut.getInDateShiftFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
     }
 
     @Test
-    public void getInputDateFormatterWithSetFormatNullShouldReturnDefaultFormatter()
+    public void getInDateShiftFormatterWithSetFormatNullShouldReturnDefaultFormatter()
     {
-        cut.setInputDateFormat( null );
-        final DateTimeFormatter formatter = cut.getInputDateFormatter();
+        cut.setInDateShiftFormat( null );
+        final DateTimeFormatter formatter = cut.getInDateShiftFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
     }
 
     @Test
-    public void getInputDateFormatterWithSetFormatShouldReturnCustomFormatter()
+    public void getInDateShiftFormatterWithSetFormatShouldReturnCustomFormatter()
     {
-        cut.setInputDateFormat( "dd-MM-yyyy XXX ss-mm-HH" );
-        final DateTimeFormatter formatter = cut.getInputDateFormatter();
+        cut.setInDateShiftFormat( "dd-MM-yyyy XXX ss-mm-HH" );
+        final DateTimeFormatter formatter = cut.getInDateShiftFormatter();
+
+        assertThat( formatter, notNullValue() );
+        assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019 +01:00 42-50-13" ) );
+    }
+
+    @Test
+    public void getInDateOffsetFormatterWOSetFormatShouldReturnDefaultFormatter()
+    {
+        final DateTimeFormatter formatter = cut.getInDateOffsetFormatter();
+
+        assertThat( formatter, notNullValue() );
+        assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
+    }
+
+    @Test
+    public void getInDateOffsetFormatterWithSetFormatNullShouldReturnDefaultFormatter()
+    {
+        cut.setInDateOffsetFormat( null );
+        final DateTimeFormatter formatter = cut.getInDateOffsetFormatter();
+
+        assertThat( formatter, notNullValue() );
+        assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
+    }
+
+    @Test
+    public void getInDateOffsetFormatterWithSetFormatShouldReturnCustomFormatter()
+    {
+        cut.setInDateOffsetFormat( "dd-MM-yyyy XXX ss-mm-HH" );
+        final DateTimeFormatter formatter = cut.getInDateOffsetFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019 +01:00 42-50-13" ) );
@@ -72,27 +101,27 @@ public class MutableTimeshifterConfigTest
     @Test
     public void getOutputDateFormatterWOSetFormatShouldReturnDefaultFormatter()
     {
-        final DateTimeFormatter formatter = cut.getOutputDateFormatter();
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
     }
 
     @Test
-    public void getOutputDateFormatterWithSetFormatNullShouldReturnDefaultFormatter()
+    public void getOutDateShiftedFormatterWithSetFormatNullShouldReturnDefaultFormatter()
     {
-        cut.setOutputDateFormat( null );
-        final DateTimeFormatter formatter = cut.getOutputDateFormatter();
+        cut.setOutDateShiftedFormat( null );
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42+01:00" ) );
     }
 
     @Test
-    public void getOutputDateFormatterWithSetFormatShouldReturnCustomFormatter()
+    public void getOutDateShiftedFormatterWithSetFormatShouldReturnCustomFormatter()
     {
-        cut.setOutputDateFormat( "dd-MM-yyyy XXX ss-mm-HH" );
-        final DateTimeFormatter formatter = cut.getOutputDateFormatter();
+        cut.setOutDateShiftedFormat( "dd-MM-yyyy XXX ss-mm-HH" );
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatter();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019 +01:00 42-50-13" ) );
@@ -101,73 +130,73 @@ public class MutableTimeshifterConfigTest
     @Test
     public void getOutputDateFormatterLocalWOSetFormatShouldReturnDefaultFormatterWOTimezone()
     {
-        final DateTimeFormatter formatter = cut.getOutputDateFormatterLocal();
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatterLocal();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42" ) );
     }
 
     @Test
-    public void getOutputDateFormatterLocalWithSetFormatNullShouldReturnDefaultFormatterWOTimezone()
+    public void getOutDateShiftedFormatterLocalWithSetFormatNullShouldReturnDefaultFormatterWOTimezone()
     {
-        cut.setOutputDateFormat( null );
-        final DateTimeFormatter formatter = cut.getOutputDateFormatterLocal();
+        cut.setOutDateShiftedFormat( null );
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatterLocal();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "2019:03:22 13:50:42" ) );
     }
 
     @Test
-    public void getOutputDateFormatterLocalWithSetFormatShouldReturnCustomFormatterWOTimezone()
+    public void getOutDateShiftedFormatterLocalWithSetFormatShouldReturnCustomFormatterWOTimezone()
     {
-        cut.setOutputDateFormat( "dd-MM-yyyy XXX ss-mm-HH" );
-        final DateTimeFormatter formatter = cut.getOutputDateFormatterLocal();
+        cut.setOutDateShiftedFormat( "dd-MM-yyyy XXX ss-mm-HH" );
+        final DateTimeFormatter formatter = cut.getOutDateShiftedFormatterLocal();
 
         assertThat( formatter, notNullValue() );
         assertThat( formatter.format( TEST_NOW ), equalTo( "22-03-2019  42-50-13" ) );
     }
 
     @Test
-    public void getHeaderLineWOSetShouldReturnNull()
+    public void getOutHeaderFormatWOSetShouldReturnNull()
     {
-        assertThat( cut.getOutputHeaderLine(), nullValue() );
+        assertThat( cut.getOutHeaderFormat(), nullValue() );
     }
 
     @Test
-    public void getHeaderLineWithNullShouldReturnNull()
+    public void getOutHeaderFormatWithNullShouldReturnNull()
     {
-        cut.setOutputHeaderLine( null );
+        cut.setOutHeaderFormat( null );
 
-        assertThat( cut.getOutputHeaderLine(), nullValue() );
+        assertThat( cut.getOutHeaderFormat(), nullValue() );
     }
 
     @Test
-    public void getHeaderLineWithElementsShouldConcatElements()
+    public void getOutHeaderFormatWithElementsShouldConcatElements()
     {
-        cut.setOutputHeaderLine( new String[] { "h1", "h2", "h3" } );
+        cut.setOutHeaderFormat( new String[] { "h1", "h2", "h3" } );
 
-        assertThat( cut.getOutputHeaderLine(), equalTo( "h1h2h3" ) );
+        assertThat( cut.getOutHeaderFormat(), equalTo( "h1h2h3" ) );
     }
 
     @Test
-    public void getFooterLineWOSetShouldReturnNull()
+    public void getOutFooterFormatWOSetShouldReturnNull()
     {
-        assertThat( cut.getOutputFooterLine(), nullValue() );
+        assertThat( cut.getOutFooterFormat(), nullValue() );
     }
 
     @Test
-    public void getFooterLineWithNullShouldReturnNull()
+    public void getOutFooterFormatWithNullShouldReturnNull()
     {
-        cut.setOutputFooterLine( null );
+        cut.setOutFooterFormat( null );
 
-        assertThat( cut.getOutputFooterLine(), nullValue() );
+        assertThat( cut.getOutFooterFormat(), nullValue() );
     }
 
     @Test
-    public void getFooterLineShouldConcatElements()
+    public void getOutFooterFormatShouldConcatElements()
     {
-        cut.setOutputFooterLine( new String[] { "f1", "f2", "f3" } );
+        cut.setOutFooterFormat( new String[] { "f1", "f2", "f3" } );
 
-        assertThat( cut.getOutputFooterLine(), equalTo( "f1f2f3" ) );
+        assertThat( cut.getOutFooterFormat(), equalTo( "f1f2f3" ) );
     }
 }

@@ -1,5 +1,8 @@
 package com.github.fiveoo.timeshifter.cli;
 
+import static com.github.fiveoo.timeshifter.cli.Constants.JAVADOC_BASE_URL;
+
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,9 +17,9 @@ public class MutableTimeshifterConfig
     implements
         TimeshifterConfig
 {
-    private static final String PARAM_NAME_SKIP_LINES_LONG               = "--inSkipLines";
-    private static final String PARAM_NAME_FIELD_CONTAINING_OFFSET_SHORT = "-fo";
-    private static final String PARAM_NAME_OUTPUT_LINE_SHORT             = "-ol";
+    private static final String PARAM_NAME_IN_LINES_SKIP_LONG       = "--inLinesSkip";
+    private static final String PARAM_NAME_IN_DATE_OFFSET_IDX_SHORT = "-iox";
+    private static final String PARAM_NAME_OUTPUT_LINE_SHORT        = "-olf";
 
     public static final String            DEFAULT_DATE_TIME_PATTERN   = "yyyy:MM:dd HH:mm:ssXXX";
     public static final DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER =
@@ -26,34 +29,45 @@ public class MutableTimeshifterConfig
     @Parameter(names = { "-i", "--in" }, description = "Source file. Default: stdin")
     private String inputFileName;
 
-    @Parameter(names = { "-id", "--inDateFormat" }, description = "Format to parse dates in input data.")
-    private String inputDateFormat = DEFAULT_DATE_TIME_PATTERN;
+    @Parameter(names = { "-isf", "--inDateShiftFormat" }, description = "Format of the date to shift in input data.")
+    private String inDateShiftFormat = DEFAULT_DATE_TIME_PATTERN;
 
-    @Parameter(names = { "-is", PARAM_NAME_SKIP_LINES_LONG }, validateWith = PositiveInteger.class,
-            description = "Number of lines at the beginning of input to skip (e.g. " + PARAM_NAME_SKIP_LINES_LONG
+    @Parameter(names = { "-isz", "--inDateShiftZone" },
+            description = "Timezone of the date to shift in input data if not contained in the field itself. "
+                    + "For valid values see " + JAVADOC_BASE_URL + "java/time/ZoneId.html#of-java.lang.String-",
+            converter = ZoneIdConverter.class)
+    private ZoneId inDateShiftZone;
+
+    @Parameter(names = { "-isx", "--inDateShiftIdx" },
+            description = "Index of the field containing the date/time to shift in input data. The index is 0-based.")
+    private int inDateShiftIdx = 1;
+
+    @Parameter(names = { "-iof", "--inDateOffsetFormat" },
+            description = "Format of the date to take offset from in input data.")
+    private String inDateOffsetFormat = DEFAULT_DATE_TIME_PATTERN;
+
+    @Parameter(names = { PARAM_NAME_IN_DATE_OFFSET_IDX_SHORT, "--inDateOffsetIdx" },
+            description = "Index of the field to take the offset from to shift. The index is 0-based.")
+    private int inDateOffsetIdx = 2;
+
+    @Parameter(names = { "-ils", PARAM_NAME_IN_LINES_SKIP_LONG }, validateWith = PositiveInteger.class,
+            description = "Number of lines at the beginning of input to skip (e.g. " + PARAM_NAME_IN_LINES_SKIP_LONG
                     + " 1  for ignoring the header line of a CSV file).")
-    private int inputLinesToSkip = 0;
-
-    @Parameter(names = { "-fs", "--fieldToShift" },
-            description = "Index of the field containing the date/time to shift. The index is 0-based.")
-    private int fieldIdxToShift = 1;
-
-    @Parameter(names = { PARAM_NAME_FIELD_CONTAINING_OFFSET_SHORT, "--fieldContainingOffset" },
-            description = "Index of the field containing an offset used to shift. The index is 0-based.")
-    private int fieldIdxOfOffset = 2;
-
-    @Parameter(names = { "-zo", "--offset" },
-            description = "Fix zone offset (e.g. +02:00) for all lines. If this is set "
-                    + PARAM_NAME_FIELD_CONTAINING_OFFSET_SHORT + " will not be evaluated.",
-            converter = ZoneOffsetConverter.class)
-    private ZoneOffset fixOffset;
+    private int inLinesSkip = 0;
 
     /* -- Output parameters -- */
     @Parameter(names = { "-o", "--out" }, description = "Destination file. Default: stdout")
     private String outputFileName;
 
-    @Parameter(names = { "-od", "--outDateFormat" }, description = "Format of shifted dates in output data.")
-    private String outputDateFormat = DEFAULT_DATE_TIME_PATTERN;
+    @Parameter(names = { "-oso", "--outDateShiftedOffset" },
+            description = "Fix zone offset (e.g. +02:00) for all lines. If this is set "
+                    + PARAM_NAME_IN_DATE_OFFSET_IDX_SHORT + " will not be evaluated. "
+                    + "For valid values see " + JAVADOC_BASE_URL + "java/time/ZoneOffset.html#of-java.lang.String-",
+            converter = ZoneOffsetConverter.class)
+    private ZoneOffset outDateShiftedOffset;
+
+    @Parameter(names = { "-osf", "--outDateShiftedFormat" }, description = "Format of shifted dates in output data.")
+    private String outDateShiftedFormat = DEFAULT_DATE_TIME_PATTERN;
 
     @Parameter(names = { PARAM_NAME_OUTPUT_LINE_SHORT, "--outLineFormat" }, variableArity = true,
             description = "Format of an output line. You can pass several parts of the output line as separate "
@@ -65,13 +79,13 @@ public class MutableTimeshifterConfig
                     + "one for shifted date/time without timezone information")
     private List<String> outputLineFormat = new ArrayList<>();
 
-    @Parameter(names = { "-oh", "--outHeader" }, variableArity = true,
-            description = "Header line to be written to the output before the first record. %n will trigger a line break.")
-    private List<String> outputHeaderLine = new ArrayList<>();
+    @Parameter(names = { "-ohf", "--outHeaderFormat" }, variableArity = true,
+            description = "Header to be written to the output before the first line of data. %n will trigger a line break.")
+    private List<String> outHeaderFormat = new ArrayList<>();
 
-    @Parameter(names = { "-of", "--outFooter" }, variableArity = true,
-            description = "Footer line to be written to the output after the last record. %n will trigger a line break.")
-    private List<String> outputFooterLine = new ArrayList<>();
+    @Parameter(names = { "-off", "--outFooterFormat" }, variableArity = true,
+            description = "Footer to be written to the output after the last line of data. %n will trigger a line break.")
+    private List<String> outFooterFormat = new ArrayList<>();
 
     @Override
     public String getInputFileName()
@@ -84,58 +98,67 @@ public class MutableTimeshifterConfig
         this.inputFileName = inputFileName;
     }
 
-    public String getInputDateFormat()
+    public String getInDateShiftFormat()
     {
-        return inputDateFormat;
+        return inDateShiftFormat;
     }
 
-    public void setInputDateFormat( final String inputDateFormat )
+    public void setInDateShiftFormat( final String inDateShiftFormat )
     {
-        this.inputDateFormat = inputDateFormat;
+        this.inDateShiftFormat = inDateShiftFormat;
     }
 
-    @Override
-    public int getInputLinesToSkip()
+    public ZoneId getInDateShiftZone()
     {
-        return inputLinesToSkip;
+        return inDateShiftZone;
     }
 
-    public void setInputLinesToSkip( final int inputLinesToSkip )
+    public void setInDateShiftZone( final ZoneId inDateShiftZone )
     {
-        this.inputLinesToSkip = inputLinesToSkip;
-    }
-
-    @Override
-    public int getFieldIdxToShift()
-    {
-        return fieldIdxToShift;
-    }
-
-    public void setFieldIdxToShift( final int fieldIdxToShift )
-    {
-        this.fieldIdxToShift = fieldIdxToShift;
+        this.inDateShiftZone = inDateShiftZone;
     }
 
     @Override
-    public int getFieldIdxOfOffset()
+    public int getInDateShiftIdx()
     {
-        return fieldIdxOfOffset;
+        return inDateShiftIdx;
     }
 
-    public void setFieldIdxOfOffset( final int fieldIdxOfOffset )
+    public void setInDateShiftIdx( final int inDateShiftIdx )
     {
-        this.fieldIdxOfOffset = fieldIdxOfOffset;
+        this.inDateShiftIdx = inDateShiftIdx;
+    }
+
+    public String getInDateOffsetFormat()
+    {
+        return inDateOffsetFormat;
+    }
+
+    public void setInDateOffsetFormat( final String inDateOffsetFormat )
+    {
+        this.inDateOffsetFormat = inDateOffsetFormat;
     }
 
     @Override
-    public ZoneOffset getFixOffset()
+    public int getInDateOffsetIdx()
     {
-        return fixOffset;
+        return inDateOffsetIdx;
     }
 
-    public void setFixOffset( final ZoneOffset fixOffset )
+    public void setInDateOffsetIdx( final int inDateOffsetIdx )
     {
-        this.fixOffset = fixOffset;
+        this.inDateOffsetIdx = inDateOffsetIdx;
+    }
+
+    @Override
+    public int getInLinesSkip()
+    {
+        return inLinesSkip;
+    }
+
+    public void setInLinesSkip( final int inputLinesToSkip )
+    {
+        this.inLinesSkip = inputLinesToSkip;
     }
 
     @Override
@@ -149,9 +172,25 @@ public class MutableTimeshifterConfig
         this.outputFileName = outputFileName;
     }
 
-    public void setOutputDateFormat( final String outputDateFormat )
+    @Override
+    public ZoneOffset getOutDateShiftedOffset()
     {
-        this.outputDateFormat = outputDateFormat;
+        return outDateShiftedOffset;
+    }
+
+    public void setOutDateShiftedOffset( final ZoneOffset outDateShiftedOffset )
+    {
+        this.outDateShiftedOffset = outDateShiftedOffset;
+    }
+
+    public String getOutDateShiftedFormat()
+    {
+        return outDateShiftedFormat;
+    }
+
+    public void setOutDateShiftedFormat( final String outDateShiftedFormat )
+    {
+        this.outDateShiftedFormat = outDateShiftedFormat;
     }
 
     @Override
@@ -171,60 +210,70 @@ public class MutableTimeshifterConfig
     }
 
     @Override
-    public String getOutputHeaderLine()
+    public String getOutHeaderFormat()
     {
-        if( outputHeaderLine.size() == 0 )
+        if( outHeaderFormat.size() == 0 )
         {
             return null;
         }
-        return String.join( "", outputHeaderLine.toArray( new String[outputHeaderLine.size()] ) );
+        return String.join( "", outHeaderFormat.toArray( new String[outHeaderFormat.size()] ) );
     }
 
-    public void setOutputHeaderLine( final String[] outputHeaderLine )
+    public void setOutHeaderFormat( final String[] outHeaderFormat )
     {
-        this.outputHeaderLine = new ArrayList<>();
-        if( outputHeaderLine != null )
+        this.outHeaderFormat = new ArrayList<>();
+        if( outHeaderFormat != null )
         {
-            this.outputHeaderLine.addAll( Arrays.asList( outputHeaderLine ) );
+            this.outHeaderFormat.addAll( Arrays.asList( outHeaderFormat ) );
         }
     }
 
     @Override
-    public String getOutputFooterLine()
+    public String getOutFooterFormat()
     {
-        if( outputFooterLine.size() == 0 )
+        if( outFooterFormat.size() == 0 )
         {
             return null;
         }
-        return String.join( "", outputFooterLine.toArray( new String[outputFooterLine.size()] ) );
+        return String.join( "", outFooterFormat.toArray( new String[outFooterFormat.size()] ) );
     }
 
-    public void setOutputFooterLine( final String[] outputFooterLine )
+    public void setOutFooterFormat( final String[] outFooterFormat )
     {
-        this.outputFooterLine = new ArrayList<>();
-        if( outputFooterLine != null )
+        this.outFooterFormat = new ArrayList<>();
+        if( outFooterFormat != null )
         {
-            this.outputFooterLine.addAll( Arrays.asList( outputFooterLine ) );
+            this.outFooterFormat.addAll( Arrays.asList( outFooterFormat ) );
         }
     }
 
     /*-- Calculated values --*/
     @Override
-    public DateTimeFormatter getInputDateFormatter()
+    public DateTimeFormatter getInDateShiftFormatter()
     {
-        return inputDateFormat == null ? DEFAULT_DATE_TIME_FORMATTER : DateTimeFormatter.ofPattern( inputDateFormat );
+        return getInDateShiftFormat() == null ? DEFAULT_DATE_TIME_FORMATTER
+                : DateTimeFormatter.ofPattern( getInDateShiftFormat() );
     }
 
     @Override
-    public DateTimeFormatter getOutputDateFormatter()
+    public DateTimeFormatter getInDateOffsetFormatter()
     {
-        return outputDateFormat == null ? DEFAULT_DATE_TIME_FORMATTER : DateTimeFormatter.ofPattern( outputDateFormat );
+        return getInDateOffsetFormat() == null ? DEFAULT_DATE_TIME_FORMATTER
+                : DateTimeFormatter.ofPattern( getInDateOffsetFormat() );
     }
 
     @Override
-    public DateTimeFormatter getOutputDateFormatterLocal()
+    public DateTimeFormatter getOutDateShiftedFormatter()
     {
-        final String outputFormatGlobal = outputDateFormat == null ? DEFAULT_DATE_TIME_PATTERN : outputDateFormat;
+        return getOutDateShiftedFormat() == null ? DEFAULT_DATE_TIME_FORMATTER
+                : DateTimeFormatter.ofPattern( getOutDateShiftedFormat() );
+    }
+
+    @Override
+    public DateTimeFormatter getOutDateShiftedFormatterLocal()
+    {
+        final String outputFormatGlobal =
+                getOutDateShiftedFormat() == null ? DEFAULT_DATE_TIME_PATTERN : getOutDateShiftedFormat();
         final String outputFormatLocal = outputFormatGlobal.replaceAll( "([^'])[0VXxZz]+", "$1" );
 
         return DateTimeFormatter.ofPattern( outputFormatLocal );

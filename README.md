@@ -24,7 +24,7 @@ Most of the examples using a data file called `example.csv`. You could find it a
 #### Input from file
 
 ```
-java -jar timeshifter.jar -i example.csv -is 1
+java -jar timeshifter.jar -i example.csv -ils 1
 ```
 is printing the following to stdout (same as input but with two additional columns containing the shifted date with
 and without timezone information)
@@ -38,13 +38,13 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,2019:03:10
 If you have some other application that is producing the data of the input file and is able to write them to stdout
 it's possible to redirect the output of this application directly into timeshifter.
 ```
-echo example.csv | java -jar timeshifter.jar -is 1
+echo example.csv | java -jar timeshifter.jar -ils 1
 ```
 
 ### Timezone given on command line
 
 ```
-java -jar timeshifter.jar -i example.csv -is 1 -zo +03:00
+java -jar timeshifter.jar -i example.csv -ils 1 -oso +03:00
 ```
 is printing the following to stdout
 ```
@@ -55,7 +55,7 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,2019:03:10
 ### Change output timestamp format
 
 ```
-java -jar timeshifter.jar -i example.csv -is 1 -od "dd. MMMM yyyy HH:mm:ss XXX"
+java -jar timeshifter.jar -i example.csv -ils 1 -osf "dd. MMMM yyyy HH:mm:ss XXX"
 ```
 is printing the following to stdout using default locale (here DE_de)
 ```
@@ -64,7 +64,7 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,10. März 
 ```
 With standard Java parameters you could use another locale
 ```
-java -Duser.country=CA -Duser.language=fr -jar timeshifter.jar -i example.csv -is 1 -od "dd. MMMM yyyy HH:mm:ss XXX"
+java -Duser.country=CA -Duser.language=fr -jar timeshifter.jar -i example.csv -ils 1 -osf "dd. MMMM yyyy HH:mm:ss XXX"
 ```
 ```
 NewImages/DSC00034.jpg,2019:03:09 17:58:00Z,2019:03:09 18:57:30+01:00,09. mars 2019 18:58:00 +01:00,09. mars 2019 18:58:00
@@ -76,7 +76,7 @@ NewImages/DSC00035.jpg,2019:03:10 13:59:36Z,2019:03:10 14:59:06+01:00,10. mars 2
 #### Using command line parameters
 
 ```
-java -jar timeshifter.jar -i example.csv -is 1 -oh "<ul>%n" -ol "<li><a href="%1$s">Image %1$s</a> taken on %4$s</li>%n" -of "</ul>"
+java -jar timeshifter.jar -i example.csv -ils 1 -ohf "<ul>%n" -olf "<li><a href="%1$s">Image %1$s</a> taken on %4$s</li>%n" -off "</ul>"
 ```
 Be aware that you have to double `%` and `"` inside the parameters if you use this command inside a Windows Command Shell script.
 
@@ -98,16 +98,16 @@ uses `exampleHtml.param`
 -i
 example.csv
 
--is
+-ils
 1
 
--oh
+-ohf
 <ul>%n
 
--ol
+-olf
 <li><a href="%1$s">Image %1$s</a> taken on %4$s</li>%n
 
--of
+-off
 </ul>
 ```
 to produce the same output as above.

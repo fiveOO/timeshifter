@@ -7,50 +7,58 @@ available options:
 ```
 Usage: java -jar timeshifter-<version>.jar [options]
   Options:
-    -fo, --fieldContainingOffset
-      Index of the field containing an offset used to shift. The index is
-      0-based.
-      Default: 2
-    -fs, --fieldToShift
-      Index of the field containing the date/time to shift. The index is
-      0-based.
-      Default: 1
     -h, --help
       Shows this help
     -i, --in
       Source file. Default: stdin
-    -id, --inDateFormat
-      Format to parse dates in input data.
+    -iof, --inDateOffsetFormat
+      Format of the date to take offset from in input data.
       Default: yyyy:MM:dd HH:mm:ssXXX
-    -is, --inSkipLines
-      Number of lines at the beginning of input to skip (e.g. --skip 1  for
-      ignoring the header line of a CSV file).
+    -iox, --inDateOffsetIdx
+      Index of the field to take the offset from to shift. The index is
+      0-based.
+      Default: 2
+    -isf, --inDateShiftFormat
+      Format of the date to shift in input data.
+      Default: yyyy:MM:dd HH:mm:ssXXX
+    -isx, --inDateShiftIdx
+      Index of the field containing the date/time to shift in input data. The
+      index is 0-based.
+      Default: 1
+    -isz, --inDateShiftZone
+      Timezone of the date to shift in input data if not contained in the field
+      itself. For valid values see https://docs.oracle.com/javase/8/docs/api/java/time/ZoneId.html#of-java.lang.String-
+    -ils, --inLinesSkip
+      Number of lines at the beginning of input to skip (e.g. --inLinesSkip 1
+      for ignoring the header line of a CSV file).
       Default: 0
-    -zo, --offset
-      Fix zone offset (e.g. +02:00) for all lines. If this is set -fo will not
-      be evaluated.
     -o, --out
       Destination file. Default: stdout
-    -od, --outDateFormat
+    -osf, --outDateShiftedFormat
       Format of shifted dates in output data.
       Default: yyyy:MM:dd HH:mm:ssXXX
-    -of, --outFooter
-      Footer line to be written to the output after the last record. %n will
+    -oso, --outDateShiftedOffset
+      Fix zone offset (e.g. +02:00) for all lines. If this is set -iox will not
+      be evaluated. For valid values see https://docs.oracle.com/javase/8/docs/api/java/time/ZoneOffset.html#of-java.lang.String-
+    -off, --outFooterFormat
+      Footer to be written to the output after the last line of data. %n will
       trigger a line break.
       Default: []
-    -oh, --outHeader
-      Header line to be written to the output before the first record. %n will
+    -ohf, --outHeaderFormat
+      Header to be written to the output before the first line of data. %n will
       trigger a line break.
       Default: []
-    -ol, --outLineFormat
+    -olf, --outLineFormat
       Format of an output line. You can pass several parts of the output line
-      as separate parameters (e.g. "-ol abc xyz" is equivalent to "-ol
+      as separate parameters (e.g. "-olf abc xyz" is equivalent to "-olf
       abcxyz"). This way may be useful/more readable if you pass the parameters
       using an @ file. %n will trigger a line break. Default: same as input
       line plus two fields at the end: one for shifted date/time including
       timezone information, one for shifted date/time without timezone
       information
       Default: []
+
+For help on date/time formats see https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
 
 Error codes:
   < 0: some error occurred; see error message
@@ -75,12 +83,12 @@ pattern / symbols have a look at the
 ### outLineFormat / outHeader / outFooter
 
 Values of these options can be given as
-- ONE value: `-ol "So Long, and Thanks for All the Fish"` by enclosing it in double quotes (Windows) / single quotes (*nix)
+- ONE value: `-olf "So Long, and Thanks for All the Fish"` by enclosing it in double quotes (Windows) / single quotes (*nix)
   or as
-- a LIST of "words": `-ol So Long, and Thanks for All the Fish` which is taken by the OS as a list of nine options
+- a LIST of "words": `-olf So Long, and Thanks for All the Fish` which is taken by the OS as a list of nine options
   as the "words" are separated by spaces and not enclosed in double / single quotes.
-  In that case each "word" found will be added to the value of `-ol` as long as the "word" does not start with a
-  defined option name like `-is`.
+  In that case each "word" found will be added to the value of `-olf` as long as the "word" does not start with a
+  defined option name like `-ils`.
 
 ### Using a parameter file
 
@@ -96,12 +104,12 @@ The requirements are very similar to ExifTools ARGFILEs.
 > -- <cite>Phil Harvey</cite>
 
 ```
--ol
+-olf
 So Long, and Thanks for All the Fish
 ```
 is equivalent to
 ```
--ol
+-olf
 So
 Long,
 and
