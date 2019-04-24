@@ -66,7 +66,7 @@ set NEW_IMAGES_DIR=%C_DIR%NewImages
 rem Folder containing tools like exiftool, timeshifter, ...
 set TOOLS_DIR=%C_DIR%tools
 
-%TOOLS_DIR%\exiftool -@ extractGpsAndTz.exiftool %NEW_IMAGES_DIR% | java -jar %TOOLS_DIR%\timeshifter.jar @adjustDates2Gps.timeshifter | %TOOLS_DIR%\exiftool -n -stay_open True -@ -
+%TOOLS_DIR%\exiftool -@ extractGpsAndTz.exiftool %NEW_IMAGES_DIR% | java -jar %TOOLS_DIR%\timeshifter.jar @adjustDates2Gps.timeshifter | %TOOLS_DIR%\exiftool -stay_open True -@ -
 %TOOLS_DIR%\exiftool -@ rename2Timestamp.exiftool %NEW_IMAGES_DIR%
 ```
 
@@ -104,16 +104,21 @@ The CSV from above is piped into Timeshifter using the following parameters (for
 # %4$s: shifted date/time incl timezone information
 # %5$s: shifted date/time excl timezone information
 -olf
+-n%n
 -m%n
 -P%n
 -a%n
 -overwrite_original%n
--FileCreateDate=%4$s%n
--FileModifyDate=%4$s%n
+-System:FileCreateDate=%4$s%n
+-System:FileModifyDate=%4$s%n
 -AllDates=%4$s%n
+-ExifIFD:CreateDate=%4$s%n
+-ExifIFD:DateTimeOriginal=%4$s%n
+-IFD0:ModifyDate=%4$s%n
+-IFD1:ModifyDate=%4$s%n
+-IPTC:TimeCreated=%4$s%n
 -XMP-photoshop:DateCreated=%4$s%n
 -XMP-exif:DateTime*=%4$s%n
--IFD1:ModifyDate=%4$s%n
 -Sony:SonyDateTime=%5$s%n
 %1$s%n
 -execute%n
@@ -128,29 +133,39 @@ This will write commands for
 [ExifTool in stay_open mode (search for -stay_open)](https://sno.phy.queensu.ca/~phil/exiftool/exiftool_pod.html)
 to stdout like:
 ```
+-n
 -m
 -P
 -a
 -overwrite_original
--FileCreateDate=2019:03:09 18:58:00+01:00
--FileModifyDate=2019:03:09 18:58:00+01:00
+-System:FileCreateDate=2019:03:09 18:58:00+01:00
+-System:FileModifyDate=2019:03:09 18:58:00+01:00
 -AllDates=2019:03:09 18:58:00+01:00
+-ExifIFD:CreateDate=2019:03:09 18:58:00+01:00
+-ExifIFD:DateTimeOriginal=2019:03:09 18:58:00+01:00
+-IFD0:ModifyDate=2019:03:09 18:58:00+01:00
+-IFD1:ModifyDate=2019:03:09 18:58:00+01:00
+-IPTC:TimeCreated=2019:03:09 18:58:00+01:00
 -XMP-photoshop:DateCreated=2019:03:09 18:58:00+01:00
 -XMP-exif:DateTime*=2019:03:09 18:58:00+01:00
--IFD1:ModifyDate=2019:03:09 18:58:00+01:00
 -Sony:SonyDateTime=2019:03:09 18:58:00
 NewImages/DSC00034.jpg
 -execute
+-n
 -m
 -P
 -a
 -overwrite_original
--FileCreateDate=2019:03:10 14:59:36+01:00
--FileModifyDate=2019:03:10 14:59:36+01:00
+-System:FileCreateDate=2019:03:10 14:59:36+01:00
+-System:FileModifyDate=2019:03:10 14:59:36+01:00
 -AllDates=2019:03:10 14:59:36+01:00
+-ExifIFD:CreateDate=2019:03:10 14:59:36+01:00
+-ExifIFD:DateTimeOriginal=2019:03:10 14:59:36+01:00
+-IFD0:ModifyDate=2019:03:10 14:59:36+01:00
+-IFD1:ModifyDate=2019:03:10 14:59:36+01:00
+-IPTC:TimeCreated=2019:03:10 14:59:36+01:00
 -XMP-photoshop:DateCreated=2019:03:10 14:59:36+01:00
 -XMP-exif:DateTime*=2019:03:10 14:59:36+01:00
--IFD1:ModifyDate=2019:03:10 14:59:36+01:00
 -Sony:SonyDateTime=2019:03:10 14:59:36
 NewImages/DSC00035.jpg
 -execute
